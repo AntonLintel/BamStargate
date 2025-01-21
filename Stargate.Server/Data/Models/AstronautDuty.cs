@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Stargate.Server.Data.Models
 {
@@ -19,6 +20,7 @@ namespace Stargate.Server.Data.Models
 
         public DateTime? DutyEndDate { get; set; }
 
+        [JsonIgnore]
         public virtual Person Person { get; set; }
     }
 
@@ -27,7 +29,14 @@ namespace Stargate.Server.Data.Models
         public void Configure(EntityTypeBuilder<AstronautDuty> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).ValueGeneratedOnAdd();
+            builder.Property(x => x.Id).ValueGeneratedOnAdd().IsRequired();
+            builder.Property(x => x.Rank).IsRequired();
+            builder.Property(x => x.DutyTitle).IsRequired();
+            builder.Property(x => x.DutyStartDate).IsRequired();
+            builder.HasOne(x => x.Person)
+                   .WithMany(x => x.AstronautDuties)
+                   .HasForeignKey(x => x.PersonId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

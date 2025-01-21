@@ -8,10 +8,8 @@ namespace Stargate.Server.Data
     {
         public IDbConnection Connection => Database.GetDbConnection();
         public DbSet<Person> People { get; set; }
-        public DbSet<AstronautDetail> AstronautDetails { get; set; }
         public DbSet<AstronautDuty> AstronautDuties { get; set; }
-
-        public DbSet<PersonAstronaut> PersonAstronauts { get; set; }
+        public DbSet<Logs> Logs { get; set; }
 
         public StargateContext(DbContextOptions<StargateContext> options)
         : base(options)
@@ -22,7 +20,7 @@ namespace Stargate.Server.Data
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(StargateContext).Assembly);
 
-            //SeedData(modelBuilder);
+            SeedData(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -35,24 +33,15 @@ namespace Stargate.Server.Data
                     new Person
                     {
                         Id = 1,
-                        Name = "John Doe"
+                        Name = "John Doe",
+                        CurrentRank = "1LT",
+                        CurrentDutyTitle = "Commander",
+                        CareerStartDate = new DateTime(2015,1,1,4,5,6)
                     },
                     new Person
                     {
                         Id = 2,
                         Name = "Jane Doe"
-                    }
-                );
-
-            modelBuilder.Entity<AstronautDetail>()
-                .HasData(
-                    new AstronautDetail
-                    {
-                        Id = 1,
-                        PersonId = 1,
-                        CurrentRank = "1LT",
-                        CurrentDutyTitle = "Commander",
-                        CareerStartDate = DateTime.Now
                     }
                 );
 

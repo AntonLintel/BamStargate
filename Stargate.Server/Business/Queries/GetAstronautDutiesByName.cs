@@ -22,25 +22,27 @@ namespace Stargate.Server.Business.Queries
 
         public async Task<GetAstronautDutiesByNameResult> Handle(GetAstronautDutiesByName request, CancellationToken cancellationToken)
         {
+            if (request is null || string.IsNullOrEmpty(request.Name))
+                throw new Exception("Bad Request");
 
             var result = new GetAstronautDutiesByNameResult();
 
-            var person = await _context.PersonAstronauts.FromSql($"SELECT a.Id as PersonId, a.Name, b.CurrentRank, b.CurrentDutyTitle, b.CareerStartDate, b.CareerEndDate FROM [Person] a LEFT JOIN [AstronautDetail] b on b.PersonId = a.Id WHERE \'{request.Name}\' = a.Name").FirstOrDefaultAsync();
+            var person = await _context.People.FirstOrDefaultAsync(p => p.Name == request.Name, cancellationToken);
 
-            result.Person = person;
+            if (person is null)
+                throw new Exception($"There was an issue getting {request.Name}'s duties. Please contact support.");
 
-            var duties = await _context.AstronautDuties.FromSql($"SELECT * FROM [AstronautDuty] WHERE \'{person.PersonId}\' = PersonId Order By DutyStartDate Desc").ToListAsync();
+            var duties = await _context.AstronautDuties.Where(p => p.PersonId == person.Id).OrderBy(d => d.DutyStartDate).ToListAsync(cancellationToken);
 
-            result.AstronautDuties = duties;
+            if (duties.Count != 0)
+                result.AstronautDuties = duties;
 
             return result;
-
         }
     }
 
     public class GetAstronautDutiesByNameResult : BaseResponse
     {
-        public PersonAstronaut Person { get; set; }
         public List<AstronautDuty> AstronautDuties { get; set; } = new List<AstronautDuty>();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Stargate.Server.Data.Models
 {
@@ -11,9 +12,16 @@ namespace Stargate.Server.Data.Models
 
         public string Name { get; set; } = string.Empty;
 
-        public virtual AstronautDetail? AstronautDetail { get; set; }
+        public string? CurrentRank { get; set; } = string.Empty;
 
-        public virtual ICollection<AstronautDuty> AstronautDuties { get; set; } = new HashSet<AstronautDuty>();
+        public string? CurrentDutyTitle { get; set; } = string.Empty;
+
+        public DateTime? CareerStartDate { get; set; }
+
+        public DateTime? CareerEndDate { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<AstronautDuty>? AstronautDuties { get; set; }
 
     }
 
@@ -21,10 +29,15 @@ namespace Stargate.Server.Data.Models
     {
         public void Configure(EntityTypeBuilder<Person> builder)
         {
+            // RULE: unique by name
+            builder.HasIndex(x => x.Name).IsUnique();
+
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Id).ValueGeneratedOnAdd();
-            builder.HasOne(z => z.AstronautDetail).WithOne(z => z.Person).HasForeignKey<AstronautDetail>(z => z.PersonId);
-            builder.HasMany(z => z.AstronautDuties).WithOne(z => z.Person).HasForeignKey(z => z.PersonId);
+            builder.Property(x => x.Id).ValueGeneratedOnAdd().IsRequired();
+            builder.HasMany(z => z.AstronautDuties)
+                   .WithOne(z => z.Person)
+                   .HasForeignKey(z => z.PersonId)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

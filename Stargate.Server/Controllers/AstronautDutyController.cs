@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Stargate.Server.Business.Commands;
 using Stargate.Server.Business.Queries;
+using Stargate.Server.Utilities;
 using System.Net;
 
 namespace Stargate.Server.Controllers
@@ -16,34 +17,61 @@ namespace Stargate.Server.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("{name}")]
+        [HttpGet("/api/GetDutiesByName{name}")]
         public async Task<IActionResult> GetAstronautDutiesByName(string name)
         {
             try
             {
-                var result = await _mediator.Send(new GetPersonByName()
+                if (string.IsNullOrEmpty(name))
+                    return BadRequest();
+
+                var result = await _mediator.Send(new GetAstronautDutiesByName()
                 {
                     Name = name
                 });
+
+                if (result.Success)
+                    DbLogger.Logger.Information($"Successfully acquired duty data for {name}!");
 
                 return this.GetResponse(result);
             }
             catch (Exception ex)
             {
+                DbLogger.Logger.Error("An error occured while attempting to retrieve duties for someone. Message: " + ex.Message);
                 return this.GetResponse(new BaseResponse()
                 {
                     Message = ex.Message,
                     Success = false,
                     ResponseCode = (int)HttpStatusCode.InternalServerError
                 });
-            }
+            }            
         }
 
-        [HttpPost("")]
-        public async Task<IActionResult> CreateAstronautDuty([FromBody] CreateAstronautDuty request)
+        [HttpPost("/api/AssignAstronautDuty")]
+        public async Task<IActionResult> AssignAstronautDuty([FromBody] AssignAstronautDuty request)
         {
-            var result = await _mediator.Send(request);
-            return this.GetResponse(result);
+            try
+            {
+                if (request is null || string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.DutyTitle) || string.IsNullOrEmpty(request.Rank))
+                    return BadRequest();
+
+                var result = await _mediator.Send(request);
+
+                if (result.Success)
+                    DbLogger.Logger.Information($"Successful assign new duty to {request.Name}!");
+
+                return this.GetResponse(result);
+            }
+            catch (Exception ex)
+            {
+                DbLogger.Logger.Error("An error occured while attempting to assign a new astronaut duty. Message: " + ex.Message);
+                return this.GetResponse(new BaseResponse()
+                {
+                    Message = ex.Message,
+                    Success = false,
+                    ResponseCode = (int)HttpStatusCode.InternalServerError
+                });
+            }            
         }
     }
 }

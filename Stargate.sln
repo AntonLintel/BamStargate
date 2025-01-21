@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stargate.Server", "Stargate.Server\Stargate.Server.csproj", "{DD98A231-D7C1-4DE0-B9CF-E540893BFA46}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "stargate.client", "stargate.client\stargate.client.esproj", "{F1DCD85F-8DD4-4B12-B1ED-7BAA8CB025A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stargate.Tests", "Stargate.Tests\Stargate.Tests.csproj", "{CAEF2328-05E6-4C9A-8DC8-38B91192CFE4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{F1DCD85F-8DD4-4B12-B1ED-7BAA8CB025A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1DCD85F-8DD4-4B12-B1ED-7BAA8CB025A0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F1DCD85F-8DD4-4B12-B1ED-7BAA8CB025A0}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CAEF2328-05E6-4C9A-8DC8-38B91192CFE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAEF2328-05E6-4C9A-8DC8-38B91192CFE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAEF2328-05E6-4C9A-8DC8-38B91192CFE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAEF2328-05E6-4C9A-8DC8-38B91192CFE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

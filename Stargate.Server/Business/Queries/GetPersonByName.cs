@@ -21,9 +21,15 @@ namespace Stargate.Server.Business.Queries
 
         public async Task<GetPersonByNameResult> Handle(GetPersonByName request, CancellationToken cancellationToken)
         {
+            if (request is null || string.IsNullOrEmpty(request.Name))
+                throw new Exception("Bad Requests");
+
             var result = new GetPersonByNameResult();
 
-            var person = await _context.PersonAstronauts.FromSql($"SELECT a.Id as PersonId, a.Name, b.CurrentRank, b.CurrentDutyTitle, b.CareerStartDate, b.CareerEndDate FROM [Person] a LEFT JOIN [AstronautDetail] b on b.PersonId = a.Id WHERE '{request.Name}' = a.Name").FirstOrDefaultAsync();
+            var person = await _context.People.FirstOrDefaultAsync(p => p.Name == request.Name, cancellationToken);
+
+            if (person is null)
+                throw new Exception($"There was an issue getting {request.Name}'s record. Please contact support.");
 
             result.Person = person;
 
@@ -33,6 +39,6 @@ namespace Stargate.Server.Business.Queries
 
     public class GetPersonByNameResult : BaseResponse
     {
-        public PersonAstronaut? Person { get; set; }
+        public Person? Person { get; set; }
     }
 }

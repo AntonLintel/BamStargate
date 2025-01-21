@@ -1,1 +1,50 @@
+<body class="container" style="background-color: rgb(138,43,226,.1)">
+  <p>
+    <mat-toolbar color="primary">
+      <button mat-icon-button class="icon">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span style="text-align:center; flex:auto">Anton's Awesome Astronaut Audit</span>
+      <!--<span style="flex:auto"></span>-->
+      <button mat-icon-button class="example-icon favorite-icon">
+        <mat-icon>favorite</mat-icon>
+      </button>
+      <button mat-icon-button class="example-icon">
+        <mat-icon>share</mat-icon>
+      </button>
+    </mat-toolbar>
+  </p>
+  <div class="container" >
+    <p style="text-align:center">
+      <mat-form-field>
+        <mat-label>Pick your Astronaut</mat-label>
+        <mat-select [formControl]="selectedPersonId" name="Astronaut">
+          <mat-option [value]="-1">--</mat-option>
+          <mat-option *ngFor="let person of query.data()?.people" [value]="person.id">{{person.id}} {{person.name}}: {{person.currentRank}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </p>
+    <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
 
+    <ul>
+      <li *ngIf="(duties$ | async)?.length === 0">No items available.</li>
+      <li *ngFor="let duty of duties$ | async" style="margin:16px;">
+        <!--key: {{duty.id}}, value: {{duty.rank}}-->
+        <mat-card class="example-card" appearance="outlined" style="margin-right:auto; width:inherit;">
+          <mat-card-header>
+            <mat-card-title>{{duty.dutyTitle}}</mat-card-title>
+            <mat-card-subtitle>{{duty.rank}}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <h4>Duty Start Date: {{duty.dutyStartDate}}</h4>
+            <h4>Duty End Date: {{duty.dutyEndDate}}</h4>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-stroked-button>Confirm</button>
+            <button mat-stroked-button color="warn">Deny</button>
+          </mat-card-actions>
+        </mat-card>
+      </li>
+    </ul>
+  </div>
+</body>

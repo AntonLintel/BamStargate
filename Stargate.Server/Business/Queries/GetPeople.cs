@@ -20,9 +20,12 @@ namespace Stargate.Server.Business.Queries
         }
         public async Task<GetPeopleResult> Handle(GetPeople request, CancellationToken cancellationToken)
         {
+            if (request is null)
+                throw new Exception("Bad Request");
+
             var result = new GetPeopleResult();
 
-            var people = await _context.PersonAstronauts.FromSql($"SELECT a.Id as PersonId, a.Name, b.CurrentRank, b.CurrentDutyTitle, b.CareerStartDate, b.CareerEndDate FROM [Person] a LEFT JOIN [AstronautDetail] b on b.PersonId = a.Id").ToListAsync();
+            var people = await _context.People.ToListAsync();
 
             result.People = people;
 
@@ -32,7 +35,6 @@ namespace Stargate.Server.Business.Queries
 
     public class GetPeopleResult : BaseResponse
     {
-        public List<PersonAstronaut> People { get; set; } = new List<PersonAstronaut> { };
-
+        public List<Person> People { get; set; } = new List<Person> { };
     }
 }
