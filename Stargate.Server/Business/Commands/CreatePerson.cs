@@ -26,7 +26,7 @@ namespace Stargate.Server.Business.Commands
                 throw new Exception("Bad Request");
 
             // RULE: person uniquely IDed by their name
-            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.Name);
+            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name.ToLower() == request.Name.ToLower());
 
             if (person is not null)
                 throw new Exception("Someone with this name already exists in the DB.");
@@ -48,7 +48,7 @@ namespace Stargate.Server.Business.Commands
             if (request is null || string.IsNullOrEmpty(request.Name))
                 throw new Exception("Request invalid");
 
-            // RULE: people that have not had an astronaut assignment won't have astronaut records (non-added)
+            // RULE: people that have not had an astronaut assignment won't have astronaut records (none-added)
             var newPerson = new Person()
             {
                 Name = request.Name,

@@ -33,7 +33,7 @@ namespace Stargate.Server.Business.Commands
                 throw new Exception("Bad Request");
 
             // name works because of rule one
-            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.Name);
+            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name.ToLower() == request.Name.ToLower());
 
             if (person is null)
                 throw new Exception($"Unable to find records for {request.Name}. Please contact support.");
@@ -59,11 +59,11 @@ namespace Stargate.Server.Business.Commands
             if (request is null || string.IsNullOrEmpty(request.Name))
                 throw new Exception("Bad Request");
 
-            var person = await _context.People.FirstOrDefaultAsync(p => p.Name == request.Name, cancellationToken);
+            var person = await _context.People.FirstOrDefaultAsync(p => p.Name.ToLower() == request.Name.ToLower(), cancellationToken);
 
             // Person 
             if (person is null)
-                throw new Exception($"There was an issue getting {request.Name}'s record. Please contact support.");
+                throw new Exception($"{request.Name} was not found in the Database. Please contact support.");
 
             // RULE: Classified as Retired (if duty title is retired)
             person.CurrentDutyTitle = request.DutyTitle;
@@ -76,6 +76,7 @@ namespace Stargate.Server.Business.Commands
             _context.People.Update(person);
 
             // RULE: previous duty end date set to day before new duty start date
+            // RULE: astronaut that has not been assigned a duty will not have an astronaut record
             var astronautDuty = await _context.AstronautDuties.FirstOrDefaultAsync(p => p.PersonId == person.Id && p.DutyEndDate == null, cancellationToken);
             if (astronautDuty != null)
             {

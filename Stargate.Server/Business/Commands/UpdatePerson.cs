@@ -27,11 +27,11 @@ namespace Stargate.Server.Business.Commands
             if (request is null || string.IsNullOrEmpty(request.OriginalName) || string.IsNullOrEmpty(request.NewName))
                 throw new Exception("Bad Request");
 
-            var originalName = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.OriginalName);
+            var originalName = _context.People.AsNoTracking().FirstOrDefault(z => z.Name.ToLower() == request.OriginalName.ToLower());
             if (originalName is null)
                 throw new Exception("That person does not currently exist in the Database.");
 
-            var newName = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.NewName);
+            var newName = _context.People.AsNoTracking().FirstOrDefault(z => z.Name.ToLower() == request.NewName.ToLower());
             if (newName is not null)
                 throw new Exception("Someone with that name already exists in the DB.");
 
@@ -52,7 +52,7 @@ namespace Stargate.Server.Business.Commands
             if (request is null || string.IsNullOrEmpty(request.OriginalName) || string.IsNullOrEmpty(request.NewName))
                 throw new Exception("Request invalid");
 
-            var person = await _context.People.FirstOrDefaultAsync(p => p.Name == request.OriginalName, cancellationToken);
+            var person = await _context.People.FirstOrDefaultAsync(p => p.Name.ToLower() == request.OriginalName.ToLower(), cancellationToken);
 
             if (person is null)
                 throw new Exception($"There was an issue getting {request.OriginalName}'s record. Please contact support.");

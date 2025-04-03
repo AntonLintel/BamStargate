@@ -101,7 +101,7 @@ namespace Stargate.Server.Controllers
             }            
         }
 
-        [HttpPost("/api/Update")]
+        [HttpPost("/api/UpdatePersonByName")]
         public async Task<IActionResult> UpdatePerson([FromBody] UpdatePerson personUpdates)
         {
             try

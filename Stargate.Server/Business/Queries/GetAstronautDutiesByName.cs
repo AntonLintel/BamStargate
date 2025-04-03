@@ -27,7 +27,7 @@ namespace Stargate.Server.Business.Queries
 
             var result = new GetAstronautDutiesByNameResult();
 
-            var person = await _context.People.FirstOrDefaultAsync(p => p.Name == request.Name, cancellationToken);
+            var person = await _context.People.FirstOrDefaultAsync(p => p.Name.ToLower() == request.Name.ToLower(), cancellationToken);
 
             if (person is null)
                 throw new Exception($"There was an issue getting {request.Name}'s duties. Please contact support.");

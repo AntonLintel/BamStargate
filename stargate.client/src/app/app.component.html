@@ -39,10 +39,16 @@
             <h4>Duty Start Date: {{duty.dutyStartDate}}</h4>
             <h4>Duty End Date: {{duty.dutyEndDate}}</h4>
           </mat-card-content>
-          <mat-card-actions>
-            <button mat-stroked-button>Confirm</button>
-            <button mat-stroked-button color="warn">Deny</button>
+          <mat-card-actions *ngIf="(duty.confirmFlag) === null">
+            <button mat-stroked-button (click)="onConfirm(duty)">Confirm</button>
+            <button mat-stroked-button color="warn" (click)="onDeny(duty)">Deny</button>
           </mat-card-actions>
+          <mat-card-content *ngIf="(duty.confirmFlag) === true">
+            <h4 style="color:forestgreen">Thank you for being a friend!</h4>
+          </mat-card-content>
+          <mat-card-content *ngIf="duty.confirmFlag === false">
+            <h4 style="color:red">DANGER WILL ROBINSON! DANGER!</h4>
+          </mat-card-content>
         </mat-card>
       </li>
     </ul>

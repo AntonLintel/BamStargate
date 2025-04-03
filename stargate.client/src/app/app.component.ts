@@ -44,6 +44,9 @@ export class AppComponent {
     );
   }
 
+  onConfirm(duty: duties) { duty.confirmFlag = true }
+  onDeny(duty: duties) { duty.confirmFlag = false }
+
   query = injectQuery(() => ({
     queryKey: ['people'],
     queryFn: () => this.peopleService.getPeople(),
@@ -61,14 +64,16 @@ export class PeopleService {
   }
 
   getDuties(name: string): Observable<duties[]> {
-    return this.http.get<dutyResponse>(`/api/GetDutiesByName${name}`).pipe(
+    return this.http.get<dutyResponse>(`/api/GetDutiesByName/${name}`).pipe(
       map(response => {
-        return response.astronautDuties.sort(a => a.id)
+        return response.astronautDuties.map(duty => ({
+          ...duty, confirmFlag: null
+        })).sort((a, b) => a.id - b.id)
       }));
   }
 }
 
-interface peopleResponse {
+export interface peopleResponse {
   people: Array<people>
   success: boolean
 }
@@ -87,11 +92,12 @@ interface people {
   careerEndDate: string
 }
 
-interface duties {
+export interface duties {
   id: number
   personId: number
   rank: string
   dutyTitle: string
   dutyStartDate: string
   dutyEndDate: string
+  confirmFlag: boolean | null
 }

@@ -92,7 +92,7 @@ namespace Stargate.Tests
 
             // Act & Assert
             var ex = Assert.ThrowsAsync<Exception>(() => handler.Handle(command, CancellationToken.None));
-            Assert.That(ex.Message, Is.EqualTo("There was an issue getting NonExistent's record. Please contact support."));
+            Assert.That(ex.Message, Is.EqualTo("NonExistent was not found in the Database. Please contact support."));
         }
 
         [Test]

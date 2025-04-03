@@ -1,80 +1,50 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { of } from 'rxjs';
-import { AppComponent, PeopleService } from './app.component';
+import { Observable, of } from 'rxjs';
+import { AppComponent, PeopleService, peopleResponse, duties } from './app.component';
 import { QueryClient } from '@tanstack/angular-query-experimental';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 
-describe('AppComponent', () => {
-  let component: AppComponent;
-  let fixture: ComponentFixture<AppComponent>;
-  let peopleService: PeopleService;
-  let queryClient: QueryClient;
+describe('PeopleService', () => {
+  let service: PeopleService;
+  let httpMock: HttpTestingController;
 
-  beforeEach(async () => {
-    // Mock CurrentQuery
-    const currentQueryMock = {
-      setOptions: jasmine.createSpy('setOptions')
-    };
-
-    // Mock QueryObserver
-    const queryObserverMock = {
-      setOptions: jasmine.createSpy('setOptions'),
-      currentQuery: currentQueryMock
-    };
-
-    // Mock QueryCache
-    const queryCacheMock = {
-      build: jasmine.createSpy('build').and.returnValue(queryObserverMock)
-    };
-
-    // Mock QueryClient
-    const queryClientMock = {
-      getQueryData: jasmine.createSpy('getQueryData').and.returnValue({
-        people: [{ id: 1, name: 'John Doe', currentRank: 'Captain', currentDutyTitle: 'Commander', careerStartDate: '2020-01-01', careerEndDate: '2025-01-01' }]
-      }),
-      fetchQuery: jasmine.createSpy('fetchQuery').and.returnValue(Promise.resolve({
-        people: [{ id: 1, name: 'John Doe', currentRank: 'Captain', currentDutyTitle: 'Commander', careerStartDate: '2020-01-01', careerEndDate: '2025-01-01' }]
-      })),
-      defaultQueryOptions: jasmine.createSpy('defaultQueryOptions').and.returnValue({}),
-      getQueryCache: jasmine.createSpy('getQueryCache').and.returnValue(queryCacheMock)
-    };
-
-    await TestBed.configureTestingModule({
-      declarations: [AppComponent],
-      imports: [
-        HttpClientTestingModule,
-        ReactiveFormsModule,
-        MatToolbarModule,
-        MatIconModule,
-        MatButtonModule,
-        MatFormFieldModule,
-        MatSelectModule
-      ],
-      providers: [
-        PeopleService,
-        { provide: QueryClient, useValue: queryClientMock }
-      ],
-    }).compileComponents();
-
-    fixture = TestBed.createComponent(AppComponent);
-    component = fixture.componentInstance;
-    peopleService = TestBed.inject(PeopleService);
-    queryClient = TestBed.inject(QueryClient);
-
-    spyOn(peopleService, 'getPeople').and.returnValue(Promise.resolve({
-      people: [{ id: 1, name: 'John Doe', currentRank: 'Captain', currentDutyTitle: 'Commander', careerStartDate: '2020-01-01', careerEndDate: '2025-01-01' }],
-      success: true
-    }));
-    spyOn(peopleService, 'getDuties').and.returnValue(of([]));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [PeopleService]
+    });
+    service = TestBed.inject(PeopleService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('should create the component', () => {
-    expect(component).toBeTruthy();
+  it('should fetch people successfully', () => {
+    const mockResponse = { people: [{ id: 1, name: 'John Doe' }], success: true };
+
+    service.getPeople().then(response => {
+      expect(response.people.length).toBe(1);
+      expect(response.people[0].name).toBe('John Doe');
+    });
+
+    const req = httpMock.expectOne('/api/GetPeople');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockResponse);
+  });
+
+  it('should fetch sorted duties successfully', () => {
+    const mockResponse = { astronautDuties: [{ id: 2 }, { id: 1 }], success: true };
+
+    service.getDuties('John').subscribe(duties => {
+      expect(duties.length).toBe(2);
+      expect(duties[0].id).toBe(1);
+      expect(duties[1].id).toBe(2);
+    });
+
+    const req = httpMock.expectOne('/api/GetDutiesByNameJohn');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockResponse);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
   });
 });

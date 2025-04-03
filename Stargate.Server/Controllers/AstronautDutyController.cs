@@ -17,7 +17,7 @@ namespace Stargate.Server.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("/api/GetDutiesByName{name}")]
+        [HttpGet("/api/GetDutiesByName/{name}")]
         public async Task<IActionResult> GetAstronautDutiesByName(string name)
         {
             try
