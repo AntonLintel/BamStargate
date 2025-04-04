@@ -39,7 +39,7 @@ describe('PeopleService', () => {
       expect(duties[1].id).toBe(2);
     });
 
-    const req = httpMock.expectOne('/api/GetDutiesByNameJohn');
+    const req = httpMock.expectOne('/api/GetDutiesByName/John');
     expect(req.request.method).toBe('GET');
     req.flush(mockResponse);
   });
